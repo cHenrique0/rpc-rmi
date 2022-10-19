@@ -27,9 +27,9 @@
       </button>
     </form>
   </div> --}}
+  {{#if taskList}}
+  {{#each taskList}}
   <ul class="task-list">
-    {{#if taskList}}
-    {{#each taskList}}
     <li>
       <div class="task-content">
         {{#if this.done}}
@@ -56,19 +56,15 @@
         </form>
       </div>
     </li>
-    {{/each}}
-    {{else}}
-    <div class="task-not-found">
-      {{#if done}}
-      <h1>{{notice}}</h1>
-      {{else}}
-      <h1>Task <span>'{{title}}'</span> not found</h1>
-      {{/if}}
-      <a href="/tasks/list">
-        <i class="bi bi-arrow-left"></i>
-        Back
-      </a>
-    </div>
-    {{/if}}
   </ul>
+  {{/each}}
+  {{else}}
+  <div class="task-not-found">
+    <h1>You haven't added any tasks yet.</h1>
+    <a href="/tasks/create">
+      <i class="bi bi-plus-circle-fill"></i>
+      Add task
+    </a>
+  </div>
+  {{/if}}
 </div>
