@@ -1,0 +1,20 @@
+<div class="container">
+  <a class="back-btn" href="/tasks/list">
+    <i class="bi bi-arrow-left"></i>
+    Back
+  </a>
+  <h1>
+    Editing the task:
+    {{task.title}}</h1>
+  <form class="form" action="/tasks/edit/{{task.id}}" method="POST">
+    <div class="form-control">
+      <label for="title">Title</label>
+      <input type="text" name="title" placeholder="What is your task?" value="{{task.title}}" />
+    </div>
+    <div class="form-control">
+      <label for="description">Description</label>
+      <textarea name="description" placeholder="Describe the task..." rows="5">{{task.description}}</textarea>
+    </div>
+    <button type="submit">Save task</button>
+  </form>
+</div>

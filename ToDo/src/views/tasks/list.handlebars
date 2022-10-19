@@ -1,0 +1,74 @@
+<div class="container">
+  <h1>Tasks</h1>
+  {{!-- <form class="task-search" method="GET">
+    <input type="search" name="title" placeholder="Search a task by title" />
+    <button type="submit">
+      <i class="bi bi-search"></i>
+    </button>
+  </form>
+  <button class="show-filters-btn">
+    <i class="bi bi-funnel-fill"></i>
+    Filters
+  </button>
+  <div class="task-filter show-filters">
+    <a href="/tasks/list">
+      All tasks
+    </a>
+    <form class="filter-task" method="GET">
+      <input type="hidden" name="done" value="1" />
+      <button type="submit">
+        Done tasks
+      </button>
+    </form>
+    <form class="filter-task" method="GET">
+      <input type="hidden" name="done" value="0" />
+      <button type="submit">
+        Not done tasks
+      </button>
+    </form>
+  </div> --}}
+  <ul class="task-list">
+    {{#if taskList}}
+    {{#each taskList}}
+    <li>
+      <div class="task-content">
+        {{#if this.done}}
+        <h1 class="title done">{{this.title}}</h1>
+        <p class="done">{{this.description}}</p>
+        {{else}}
+        <h1 class="title">{{this.title}}</h1>
+        <p>{{this.description}}</p>
+        {{/if}}
+      </div>
+      <div class="actions">
+        <form action="/tasks/done/{{this.id}}" method="POST">
+          <button type="submit">
+            <i class="bi bi-check-square"></i>
+          </button>
+        </form>
+        <a href="/tasks/edit/{{this.id}}">
+          <i class="bi bi-pencil-square"></i>
+        </a>
+        <form action="/tasks/delete/{{this.id}}" method="POST">
+          <button type="submit">
+            <i class="bi bi-x-square"></i>
+          </button>
+        </form>
+      </div>
+    </li>
+    {{/each}}
+    {{else}}
+    <div class="task-not-found">
+      {{#if done}}
+      <h1>{{notice}}</h1>
+      {{else}}
+      <h1>Task <span>'{{title}}'</span> not found</h1>
+      {{/if}}
+      <a href="/tasks/list">
+        <i class="bi bi-arrow-left"></i>
+        Back
+      </a>
+    </div>
+    {{/if}}
+  </ul>
+</div>
