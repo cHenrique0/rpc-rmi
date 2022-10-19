@@ -10,10 +10,10 @@ taskRouter.post("/create", TaskController.createTask);
 
 taskRouter.post("/delete/:id", TaskController.deleteTask);
 
-taskRouter.post("/edit/:uuid", TaskController.updateTask);
+taskRouter.post("/edit/:id", TaskController.updateTask);
 
-taskRouter.get("/edit/:uuid", TaskController.updateTaskView);
+taskRouter.get("/edit/:id", TaskController.updateTaskView);
 
-taskRouter.post("/done/:uuid", TaskController.doneTask);
+taskRouter.post("/done/:id", TaskController.doneTask);
 
 module.exports = taskRouter;
