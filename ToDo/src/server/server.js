@@ -101,6 +101,27 @@ const update = (call, callback) => {
 
 const done = (call, callback) => {
   let existingTask = tasks.find((n) => n.id == call.request.id);
+
+  if (existingTask) {
+    existingTask.done = existingTask.done ? false : true;
+
+    const jsonString = JSON.stringify(tasks, null, 2);
+
+    fs.writeFile(taskDB, jsonString, (err) => {
+      if (err) {
+        console.log("Error writing file", err);
+      } else {
+        console.log("Successfully wrote file");
+      }
+    });
+
+    callback(null, existingTask);
+  } else {
+    callback({
+      code: grpc.status.NOT_FOUND,
+      details: "Not found",
+    });
+  }
 };
 
 server.addService(taskProto.TaskService.service, {

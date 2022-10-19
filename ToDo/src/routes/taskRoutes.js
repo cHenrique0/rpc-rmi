@@ -4,6 +4,8 @@ const taskRouter = Router();
 
 taskRouter.get("/list", TaskController.getAll);
 
+taskRouter.get("/:id", TaskController.getOne);
+
 taskRouter.get("/create", TaskController.createTaskView);
 
 taskRouter.post("/create", TaskController.createTask);

@@ -38,7 +38,7 @@ class TaskController {
 
     client.insert(newTask, (err, data) => {
       if (err) throw err;
-      console.log("Food created successfully: ", data);
+      console.log("Task created successfully: ", data);
     });
 
     return response.status(StatusCodes.CREATED).redirect("/tasks/list");
@@ -50,7 +50,7 @@ class TaskController {
 
     client.remove({ id: id }, (err, _) => {
       if (err) throw err;
-      console.log("Customer removed successfully");
+      console.log("Task removed successfully");
     });
 
     return response.status(StatusCodes.OK).redirect("/tasks/list");
@@ -81,15 +81,19 @@ class TaskController {
     return response.status(StatusCodes.OK).redirect("/tasks/list");
   }
 
-  // done task
+  // Done task
   static async doneTask(request, response) {
     const { id } = request.params;
 
-    /* const doneTask = {
-      done: !!Number(done) ? false : true,
-    }; */
+    client.get({ id: id }, (err, data) => {
+      if (err) throw err;
+      let task = data;
 
-    // await Task.update({ ...doneTask }, { where: { uuid } });
+      client.done(task, (err, data) => {
+        if (err) throw err;
+        console.log("Done task successfully: ", data);
+      });
+    });
 
     return response.status(StatusCodes.OK).redirect("/tasks/list");
   }
