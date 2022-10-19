@@ -18,7 +18,7 @@ const getAll = (_, callback) => {
   return callback(null, { tasks });
 };
 
-const getOne = (call, callback) => {
+const get = (call, callback) => {
   let task = tasks.find((n) => n.id == call.request.id);
   if (!task) {
     callback({
@@ -77,8 +77,8 @@ const update = (call, callback) => {
   let existingTask = tasks.find((n) => n.id == call.request.id);
 
   if (existingTask) {
-    existingTask.name = call.request.name;
-    existingTask.value = call.request.value;
+    existingTask.title = call.request.title;
+    existingTask.description = call.request.description;
 
     const jsonString = JSON.stringify(tasks, null, 2);
 
@@ -99,12 +99,17 @@ const update = (call, callback) => {
   }
 };
 
+const done = (call, callback) => {
+  let existingTask = tasks.find((n) => n.id == call.request.id);
+};
+
 server.addService(taskProto.TaskService.service, {
   getAll,
-  getOne,
+  get,
   insert,
   remove,
   update,
+  done,
 });
 
 server.bindAsync(
