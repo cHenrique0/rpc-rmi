@@ -34,6 +34,18 @@ class TaskController {
 
     return response.status(StatusCodes.CREATED).redirect("/tasks/list");
   }
+
+  // Delete a task
+  static async deleteTask(request, response) {
+    const { id } = request.params;
+
+    client.remove({ id: id }, (err, _) => {
+      if (err) throw err;
+      console.log("Customer removed successfully");
+    });
+
+    return response.status(StatusCodes.OK).redirect("/tasks/list");
+  }
 }
 
 module.exports = TaskController;

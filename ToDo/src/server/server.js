@@ -48,7 +48,37 @@ const insert = (call, callback) => {
   callback(null, newTask);
 };
 
-server.addService(taskProto.TaskService.service, { getAll, getOne, insert });
+const remove = (call, callback) => {
+  console.log(call.request.id);
+  let existingFoodIndex = tasks.findIndex((n) => n.id == call.request.id);
+
+  if (existingFoodIndex != -1) {
+    tasks.splice(existingFoodIndex, 1);
+    const jsonString = JSON.stringify(tasks, null, 2);
+
+    fs.writeFile(taskDB, jsonString, (err) => {
+      if (err) {
+        console.log("Error writing file", err);
+      } else {
+        console.log("Successfully wrote file");
+      }
+    });
+
+    callback(null, {});
+  } else {
+    callback({
+      code: grpc.status.NOT_FOUND,
+      details: "Not found",
+    });
+  }
+};
+
+server.addService(taskProto.TaskService.service, {
+  getAll,
+  getOne,
+  insert,
+  remove,
+});
 
 server.bindAsync(
   "0.0.0.0:50051",
