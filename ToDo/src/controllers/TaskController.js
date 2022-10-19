@@ -15,6 +15,15 @@ class TaskController {
     });
   }
 
+  // Get one task
+  static async getOne(request, response) {
+    const { id } = req.params;
+    client.get({ id: id }, (err, data) => {
+      if (err) throw err;
+      return response.status(StatusCodes.OK).json(data);
+    });
+  }
+
   // Task create page
   static createTaskView(request, response) {
     return response.status(StatusCodes.OK).render("tasks/create");
@@ -42,6 +51,27 @@ class TaskController {
     client.remove({ id: id }, (err, _) => {
       if (err) throw err;
       console.log("Customer removed successfully");
+    });
+
+    return response.status(StatusCodes.OK).redirect("/tasks/list");
+  }
+
+  // Task update page
+  static async updateTaskView(request, response) {
+    const { id } = request.params;
+    // TODO: get the task by id
+    return response.status(StatusCodes.OK).render("tasks/edit", { task });
+  }
+
+  // Update a task
+  static async updateTask(request, response) {
+    const { id } = request.params;
+    const { title, description } = request.body;
+    const updatedTask = { title, description };
+
+    client.update(updatedTask, (err, data) => {
+      if (err) throw err;
+      console.log("Task updated successfully: ", data);
     });
 
     return response.status(StatusCodes.OK).redirect("/tasks/list");

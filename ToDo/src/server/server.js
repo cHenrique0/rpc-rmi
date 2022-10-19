@@ -50,10 +50,10 @@ const insert = (call, callback) => {
 
 const remove = (call, callback) => {
   console.log(call.request.id);
-  let existingFoodIndex = tasks.findIndex((n) => n.id == call.request.id);
+  let existingTaskIndex = tasks.findIndex((n) => n.id == call.request.id);
 
-  if (existingFoodIndex != -1) {
-    tasks.splice(existingFoodIndex, 1);
+  if (existingTaskIndex != -1) {
+    tasks.splice(existingTaskIndex, 1);
     const jsonString = JSON.stringify(tasks, null, 2);
 
     fs.writeFile(taskDB, jsonString, (err) => {
@@ -73,11 +73,38 @@ const remove = (call, callback) => {
   }
 };
 
+const update = (call, callback) => {
+  let existingTask = tasks.find((n) => n.id == call.request.id);
+
+  if (existingTask) {
+    existingTask.name = call.request.name;
+    existingTask.value = call.request.value;
+
+    const jsonString = JSON.stringify(tasks, null, 2);
+
+    fs.writeFile(taskDB, jsonString, (err) => {
+      if (err) {
+        console.log("Error writing file", err);
+      } else {
+        console.log("Successfully wrote file");
+      }
+    });
+
+    callback(null, existingTask);
+  } else {
+    callback({
+      code: grpc.status.NOT_FOUND,
+      details: "Not found",
+    });
+  }
+};
+
 server.addService(taskProto.TaskService.service, {
   getAll,
   getOne,
   insert,
   remove,
+  update,
 });
 
 server.bindAsync(
