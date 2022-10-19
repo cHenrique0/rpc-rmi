@@ -10,9 +10,8 @@ const taskProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
 
-const taskData = fs.readFileSync(
-  path.resolve(__dirname, "../database/tasks.json")
-);
+const taskDB = path.resolve(__dirname, "../database/tasks.json");
+const taskData = fs.readFileSync(taskDB);
 const tasks = JSON.parse(taskData);
 
 const getAll = (_, callback) => {
@@ -31,7 +30,25 @@ const getOne = (call, callback) => {
   return callback(null, task);
 };
 
-server.addService(taskProto.TaskService.service, { getAll, getOne });
+const insert = (call, callback) => {
+  let newTask = call.request;
+
+  tasks.push({ ...newTask });
+
+  const jsonString = JSON.stringify(tasks, null, 2);
+
+  fs.writeFile(taskDB, jsonString, (err) => {
+    if (err) {
+      console.log("Error writing file", err);
+    } else {
+      console.log("Successfully wrote file");
+    }
+  });
+
+  callback(null, newTask);
+};
+
+server.addService(taskProto.TaskService.service, { getAll, getOne, insert });
 
 server.bindAsync(
   "0.0.0.0:50051",
