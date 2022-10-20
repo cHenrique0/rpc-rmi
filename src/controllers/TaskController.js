@@ -15,6 +15,20 @@ class TaskController {
     });
   }
 
+  // Get tasks by title
+  static async getByTitle(request, response) {
+    let { title } = request.query;
+
+    client.getByTitle({ title }, (err, data) => {
+      if (!err) {
+        const taskList = data.tasks;
+        return response
+          .status(StatusCodes.OK)
+          .render("tasks/list", { taskList });
+      }
+    });
+  }
+
   // Get a task by id
   static async getOne(request, response) {
     const { id } = request.params;

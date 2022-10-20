@@ -1,9 +1,9 @@
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const path = require("path");
-const fs = require("fs");
 const Task = require("../models/Task");
 const database = require("../database/db");
+const { Op } = require("sequelize");
 
 const packageDefinition = protoLoader.loadSync(
   path.resolve(__dirname, "../../proto/task.proto")
@@ -27,6 +27,16 @@ const getById = async (call, callback) => {
     return;
   }
   return callback(null, task);
+};
+
+const getByTitle = async (call, callback) => {
+  let title = call.request.title;
+  let condition = title ? { title: { [Op.like]: `%${title}%` } } : undefined;
+  const tasks = await Task.findAll({
+    where: condition,
+    raw: true,
+  });
+  return callback(null, { tasks });
 };
 
 const insert = async (call, callback) => {
@@ -120,6 +130,7 @@ const done = async (call, callback) => {
 server.addService(taskProto.TaskService.service, {
   getAll,
   getById,
+  getByTitle,
   insert,
   remove,
   update,
