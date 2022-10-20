@@ -15,10 +15,10 @@ class TaskController {
     });
   }
 
-  // Get one task
+  // Get a task by id
   static async getOne(request, response) {
     const { id } = request.params;
-    client.get({ id: id }, (err, data) => {
+    client.getById({ id: id }, (err, data) => {
       if (err) throw err;
       return response.status(StatusCodes.OK).json(data);
     });
@@ -58,7 +58,7 @@ class TaskController {
   static async updateTaskView(request, response) {
     const { id } = request.params;
     // TODO: get the task by id
-    client.get({ id: id }, (err, data) => {
+    client.getById({ id: id }, (err, data) => {
       if (err) throw err;
       const task = data;
       return response.status(StatusCodes.OK).render("tasks/edit", { task });
@@ -82,7 +82,7 @@ class TaskController {
   static async doneTask(request, response) {
     const { id } = request.params;
 
-    client.get({ id: id }, (err, data) => {
+    client.getById({ id: id }, (err, data) => {
       if (err) throw err;
       let task = data;
 

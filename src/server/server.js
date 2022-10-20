@@ -17,7 +17,7 @@ const getAll = async (_, callback) => {
   return callback(null, { tasks });
 };
 
-const get = async (call, callback) => {
+const getById = async (call, callback) => {
   const task = await Task.findByPk(call.request.id);
   if (!task) {
     callback({
@@ -119,7 +119,7 @@ const done = async (call, callback) => {
 
 server.addService(taskProto.TaskService.service, {
   getAll,
-  get,
+  getById,
   insert,
   remove,
   update,

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 service TaskService {
     rpc GetAll (Empty) returns (TaskList) {}
-    rpc Get (TaskRequestId) returns (Task) {}
+    rpc GetById (TaskRequestId) returns (Task) {}
     rpc Insert (Task) returns (Task) {}
     rpc Update (Task) returns (Task) {}
     rpc Remove (TaskRequestId) returns (Empty) {}
