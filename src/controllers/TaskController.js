@@ -39,9 +39,8 @@ class TaskController {
     client.insert(newTask, (err, data) => {
       if (err) throw err;
       console.log("Task created successfully: ", data);
+      return response.status(StatusCodes.CREATED).redirect("/tasks/list");
     });
-
-    return response.status(StatusCodes.CREATED).redirect("/tasks/list");
   }
 
   // Delete a task
@@ -75,9 +74,8 @@ class TaskController {
     client.update(updatedTask, (err, data) => {
       if (err) throw err;
       console.log("Task updated successfully: ", data);
+      return response.status(StatusCodes.OK).redirect("/tasks/list");
     });
-
-    return response.status(StatusCodes.OK).redirect("/tasks/list");
   }
 
   // Done task
@@ -91,10 +89,9 @@ class TaskController {
       client.done(task, (err, data) => {
         if (err) throw err;
         console.log("Done task successfully: ", data);
+        return response.status(StatusCodes.OK).redirect("/tasks/list");
       });
     });
-
-    return response.status(StatusCodes.OK).redirect("/tasks/list");
   }
 }
 
