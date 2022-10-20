@@ -29,9 +29,11 @@ const getById = async (call, callback) => {
   return callback(null, task);
 };
 
-const getByTitle = async (call, callback) => {
+const filterTasks = async (call, callback) => {
   let title = call.request.title;
+  let done = call.request.done;
   let condition = title ? { title: { [Op.like]: `%${title}%` } } : undefined;
+
   const tasks = await Task.findAll({
     where: condition,
     raw: true,
@@ -130,7 +132,7 @@ const done = async (call, callback) => {
 server.addService(taskProto.TaskService.service, {
   getAll,
   getById,
-  getByTitle,
+  filterTasks,
   insert,
   remove,
   update,

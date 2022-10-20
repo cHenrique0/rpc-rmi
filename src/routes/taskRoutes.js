@@ -4,7 +4,7 @@ const taskRouter = Router();
 
 taskRouter.get("/list", TaskController.getAll);
 
-taskRouter.get("/search", TaskController.getByTitle);
+taskRouter.get("/search", TaskController.filterTasks);
 
 taskRouter.get("/create", TaskController.createTaskView);
 

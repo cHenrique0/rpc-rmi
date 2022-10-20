@@ -6,7 +6,7 @@
       <i class="bi bi-search"></i>
     </button>
   </form>
-  {{!-- <button class="show-filters-btn">
+  <button class="show-filters-btn">
     <i class="bi bi-funnel-fill"></i>
     Filters
   </button>
@@ -14,19 +14,19 @@
     <a href="/tasks/list">
       All tasks
     </a>
-    <form class="filter-task" method="GET">
+    <form class="filter-task" method="GET" action="/tasks/search">
       <input type="hidden" name="done" value="1" />
       <button type="submit">
         Done tasks
       </button>
     </form>
-    <form class="filter-task" method="GET">
+    <form class="filter-task" method="GET" action="/tasks/search">
       <input type="hidden" name="done" value="0" />
       <button type="submit">
         Not done tasks
       </button>
     </form>
-  </div> --}}
+  </div>
   {{#if taskList}}
   {{#each taskList}}
   <ul class="task-list">

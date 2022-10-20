@@ -3,7 +3,7 @@ syntax = "proto3";
 service TaskService {
     rpc GetAll (Empty) returns (TaskList) {}
     rpc GetById (TaskRequestId) returns (Task) {}
-    rpc GetByTitle (TaskRequestTitle) returns (TaskList) {}
+    rpc FilterTasks (TaskRequest) returns (TaskList) {}
     rpc Insert (Task) returns (Task) {}
     rpc Update (Task) returns (Task) {}
     rpc Remove (TaskRequestId) returns (Empty) {}
@@ -27,6 +27,7 @@ message TaskRequestId {
     string id = 1;
 }
 
-message TaskRequestTitle {
+message TaskRequest {
     string title = 1;
+    bool done = 2;
 }
