@@ -60,11 +60,19 @@
   {{/each}}
   {{else}}
   <div class="task-not-found">
+    {{#if title}}
+    <h1>Task <span>'{{title}}'</span> not found</h1>
+    <a href="/tasks/list">
+      <i class="bi bi-arrow-left"></i>
+      Back
+    </a>
+    {{else}}
     <h1>You haven't added any tasks yet.</h1>
     <a href="/tasks/create">
       <i class="bi bi-plus-circle-fill"></i>
       Add task
     </a>
+    {{/if}}
   </div>
   {{/if}}
 </div>

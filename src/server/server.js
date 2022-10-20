@@ -34,6 +34,13 @@ const filterTasks = async (call, callback) => {
   let done = call.request.done;
   let condition = title ? { title: { [Op.like]: `%${title}%` } } : undefined;
 
+  if (done === true) {
+    condition = { done: true };
+  }
+  if (done === false) {
+    condition = { done: false };
+  }
+
   const tasks = await Task.findAll({
     where: condition,
     raw: true,

@@ -18,19 +18,14 @@ class TaskController {
   // Get tasks by title
   static async filterTasks(request, response) {
     let { title, done } = request.query;
-    let notice = "";
-    done = done == 1 ? true : false;
-
-    /* response
-      .status(StatusCodes.OK)
-      .render("tasks/list", { taskList, title, done, notice }); */
+    done = done == 1 ? true : done == 0 ? false : undefined;
 
     client.filterTasks({ title, done }, (err, data) => {
       if (!err) {
         const taskList = data.tasks;
         return response
           .status(StatusCodes.OK)
-          .render("tasks/list", { taskList });
+          .render("tasks/list", { taskList, title, done });
       }
     });
   }
