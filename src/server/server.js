@@ -1,7 +1,9 @@
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const path = require("path");
-var fs = require("fs");
+const fs = require("fs");
+const Task = require("../models/Task");
+const database = require("../database/db");
 
 const packageDefinition = protoLoader.loadSync(
   path.resolve(__dirname, "../../proto/task.proto")
@@ -10,16 +12,13 @@ const taskProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
 
-const taskDB = path.resolve(__dirname, "../database/tasks.json");
-const taskData = fs.readFileSync(taskDB);
-const tasks = JSON.parse(taskData);
-
-const getAll = (_, callback) => {
+const getAll = async (_, callback) => {
+  const tasks = await Task.findAll();
   return callback(null, { tasks });
 };
 
-const get = (call, callback) => {
-  let task = tasks.find((n) => n.id == call.request.id);
+const get = async (call, callback) => {
+  const task = await Task.findByPk(call.request.id);
   if (!task) {
     callback({
       code: grpc.status.NOT_FOUND,
@@ -30,98 +29,92 @@ const get = (call, callback) => {
   return callback(null, task);
 };
 
-const insert = (call, callback) => {
+const insert = async (call, callback) => {
   let newTask = call.request;
 
-  tasks.push({ ...newTask });
-
-  const jsonString = JSON.stringify(tasks, null, 2);
-
-  fs.writeFile(taskDB, jsonString, (err) => {
-    if (err) {
-      console.log("Error writing file", err);
-    } else {
-      console.log("Successfully wrote file");
+  await Task.create({ ...newTask }).then((task) => {
+    if (!task) {
+      return callback({
+        code: grpc.status.INTERNAL,
+        details: "Error creating task",
+      });
     }
   });
 
   callback(null, newTask);
 };
 
-const remove = (call, callback) => {
-  console.log(call.request.id);
-  let existingTaskIndex = tasks.findIndex((n) => n.id == call.request.id);
-
-  if (existingTaskIndex != -1) {
-    tasks.splice(existingTaskIndex, 1);
-    const jsonString = JSON.stringify(tasks, null, 2);
-
-    fs.writeFile(taskDB, jsonString, (err) => {
-      if (err) {
-        console.log("Error writing file", err);
-      } else {
-        console.log("Successfully wrote file");
+const remove = async (call, callback) => {
+  await Task.findByPk(call.request.id).then(async (task) => {
+    if (!task) {
+      return callback({
+        code: grpc.status.NOT_FOUND,
+        details: "Not found",
+      });
+    }
+    await Task.destroy({ where: { id: task.id } }).then((deletedRow) => {
+      if (deletedRow === 0) {
+        return callback({
+          code: grpc.status.INTERNAL,
+          details: "Error deleting task",
+        });
       }
     });
+  });
 
-    callback(null, {});
-  } else {
-    callback({
-      code: grpc.status.NOT_FOUND,
-      details: "Not found",
-    });
-  }
+  callback(null, {});
 };
 
-const update = (call, callback) => {
-  let existingTask = tasks.find((n) => n.id == call.request.id);
+const update = async (call, callback) => {
+  const existingTask = await Task.findByPk(call.request.id);
 
-  if (existingTask) {
-    existingTask.title = call.request.title;
-    existingTask.description = call.request.description;
-
-    const jsonString = JSON.stringify(tasks, null, 2);
-
-    fs.writeFile(taskDB, jsonString, (err) => {
-      if (err) {
-        console.log("Error writing file", err);
-      } else {
-        console.log("Successfully wrote file");
-      }
-    });
-
-    callback(null, existingTask);
-  } else {
-    callback({
+  if (!existingTask) {
+    return callback({
       code: grpc.status.NOT_FOUND,
       details: "Not found",
     });
   }
+
+  await Task.update(
+    { ...call.request },
+    { where: { id: existingTask.id } }
+  ).then((updatedRow) => {
+    if ([updatedRow] === 0) {
+      return callback({
+        code: grpc.status.INTERNAL,
+        details: "Error updating task",
+      });
+    }
+  });
+
+  callback(null, call.request);
 };
 
-const done = (call, callback) => {
-  let existingTask = tasks.find((n) => n.id == call.request.id);
+const done = async (call, callback) => {
+  const existingTask = await Task.findByPk(call.request.id, { raw: true });
 
-  if (existingTask) {
-    existingTask.done = existingTask.done ? false : true;
-
-    const jsonString = JSON.stringify(tasks, null, 2);
-
-    fs.writeFile(taskDB, jsonString, (err) => {
-      if (err) {
-        console.log("Error writing file", err);
-      } else {
-        console.log("Successfully wrote file");
-      }
-    });
-
-    callback(null, existingTask);
-  } else {
-    callback({
+  if (!existingTask) {
+    return callback({
       code: grpc.status.NOT_FOUND,
       details: "Not found",
     });
   }
+
+  existingTask.done = existingTask.done ? false : true;
+
+  await Task.update(
+    { ...existingTask },
+    { where: { id: existingTask.id } }
+  ).then((updatedRow) => {
+    if ([updatedRow] === 0) {
+      return callback({
+        code: grpc.status.INTERNAL,
+        details: "Error updating task",
+      });
+    }
+  });
+
+  callback(null, existingTask);
 };
 
 server.addService(taskProto.TaskService.service, {
@@ -133,11 +126,19 @@ server.addService(taskProto.TaskService.service, {
   done,
 });
 
-server.bindAsync(
-  "0.0.0.0:50051",
-  grpc.ServerCredentials.createInsecure(),
-  () => {
-    server.start();
-    console.log("Server is running at port 50051");
-  }
-);
+database
+  .sync()
+  .then(() => {
+    console.log("* Database synced succefully");
+    server.bindAsync(
+      "0.0.0.0:50051",
+      grpc.ServerCredentials.createInsecure(),
+      () => {
+        server.start();
+        console.log("Server is running at port 50051");
+      }
+    );
+  })
+  .catch((err) => {
+    console.log(err);
+  });
