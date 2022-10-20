@@ -51,9 +51,8 @@ class TaskController {
     client.remove({ id: id }, (err, _) => {
       if (err) throw err;
       console.log("Task removed successfully");
+      return response.status(StatusCodes.OK).redirect("/tasks/list");
     });
-
-    return response.status(StatusCodes.OK).redirect("/tasks/list");
   }
 
   // Task update page
